@@ -69,11 +69,7 @@ export default function Dashboard({ user, onLogout }: Props) {
 
       <main className="main">
         {tab === 'today' ? (
-          <TodayPanel
-            onStockChange={(s) => {
-              setStock(s)
-            }}
-          />
+          <TodayPanel onStockChange={setStock} />
         ) : (
           <StatsPanel stock={stock} />
         )}

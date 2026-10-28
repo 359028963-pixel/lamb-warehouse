@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import {
   api,
@@ -11,6 +11,11 @@ import {
 type Props = { onStockChange: (s: Stock) => void }
 
 export default function TodayPanel({ onStockChange }: Props) {
+  const onStockChangeRef = useRef(onStockChange)
+  useEffect(() => {
+    onStockChangeRef.current = onStockChange
+  }, [onStockChange])
+
   const [date, setDate] = useState(todayLocal())
   const [items, setItems] = useState<Movement[]>([])
   const [stock, setStock] = useState<Stock | null>(null)
@@ -28,13 +33,13 @@ export default function TodayPanel({ onStockChange }: Props) {
       const data = await api.movements(date)
       setItems(data.items)
       setStock(data.stock)
-      onStockChange(data.stock)
+      onStockChangeRef.current(data.stock)
     } catch (e) {
       setMsg({ type: 'err', text: e instanceof Error ? e.message : '加载失败' })
     } finally {
       setLoading(false)
     }
-  }, [date, onStockChange])
+  }, [date])
 
   useEffect(() => {
     load()
@@ -56,7 +61,7 @@ export default function TodayPanel({ onStockChange }: Props) {
         moved_at: date,
       })
       setStock(res.stock)
-      onStockChange(res.stock)
+      onStockChangeRef.current(res.stock)
       if (type === 'in') {
         setInKg('')
         setInNote('')
@@ -78,7 +83,7 @@ export default function TodayPanel({ onStockChange }: Props) {
     try {
       const res = await api.deleteMovement(id)
       setStock(res.stock)
-      onStockChange(res.stock)
+      onStockChangeRef.current(res.stock)
       await load()
     } catch (e) {
       setMsg({ type: 'err', text: e instanceof Error ? e.message : '删除失败' })
