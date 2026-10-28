@@ -67,8 +67,11 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(body),
     }),
-  deleteMovement: (id: number) =>
-    request<{ ok: boolean; stock: Stock }>(`/api/movements/${id}`, { method: 'DELETE' }),
+  deleteMovement: (id: number, password: string) =>
+    request<{ ok: boolean; stock: Stock }>(`/api/movements/${id}`, {
+      method: 'DELETE',
+      body: JSON.stringify({ password }),
+    }),
   statsToday: (date?: string) =>
     request<DayStats>(
       `/api/stats/today${date ? `?date=${encodeURIComponent(date)}` : ''}`,

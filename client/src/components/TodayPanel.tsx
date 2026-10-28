@@ -26,6 +26,9 @@ export default function TodayPanel({ onStockChange }: Props) {
   const [msg, setMsg] = useState<{ type: 'ok' | 'err'; text: string } | null>(null)
   const [busy, setBusy] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [pendingDelete, setPendingDelete] = useState<Movement | null>(null)
+  const [deletePassword, setDeletePassword] = useState('')
+  const [deleteBusy, setDeleteBusy] = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -78,15 +81,37 @@ export default function TodayPanel({ onStockChange }: Props) {
     }
   }
 
-  async function remove(id: number) {
-    if (!confirm('确定删除这条记录？')) return
+  function askDelete(item: Movement) {
+    setMsg(null)
+    setPendingDelete(item)
+    setDeletePassword('')
+  }
+
+  function cancelDelete() {
+    if (deleteBusy) return
+    setPendingDelete(null)
+    setDeletePassword('')
+  }
+
+  async function confirmDelete() {
+    if (!pendingDelete) return
+    if (!deletePassword.trim()) {
+      setMsg({ type: 'err', text: '请输入登录密码以确认删除' })
+      return
+    }
+    setDeleteBusy(true)
+    setMsg(null)
     try {
-      const res = await api.deleteMovement(id)
-      setStock(res.stock)
+      const res = await api.deleteMovement(pendingDelete.id, deletePassword)
       onStockChangeRef.current(res.stock)
+      setPendingDelete(null)
+      setDeletePassword('')
+      setMsg({ type: 'ok', text: '已删除该记录' })
       await load()
     } catch (e) {
       setMsg({ type: 'err', text: e instanceof Error ? e.message : '删除失败' })
+    } finally {
+      setDeleteBusy(false)
     }
   }
 
@@ -199,7 +224,7 @@ export default function TodayPanel({ onStockChange }: Props) {
                   {item.note && <span className="muted">{item.note}</span>}
                   <span className="muted tiny">{item.created_at}</span>
                 </div>
-                <button type="button" className="btn ghost danger" onClick={() => remove(item.id)}>
+                <button type="button" className="btn ghost danger" onClick={() => askDelete(item)}>
                   删除
                 </button>
               </li>
@@ -207,6 +232,51 @@ export default function TodayPanel({ onStockChange }: Props) {
           </ul>
         )}
       </section>
+
+      {pendingDelete && (
+        <div className="modal-backdrop" role="presentation" onClick={cancelDelete}>
+          <div
+            className="modal card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 id="delete-title">确认删除</h3>
+            <p className="muted">
+              将删除这条{pendingDelete.type === 'in' ? '入库' : '出库'}记录：
+              <strong>
+                {' '}
+                {pendingDelete.type === 'in' ? '+' : '−'}
+                {fmtKg(pendingDelete.kilograms)} kg
+              </strong>
+              。请输入登录密码确认。
+            </p>
+            <label>
+              登录密码
+              <input
+                type="password"
+                autoComplete="current-password"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') confirmDelete()
+                }}
+                placeholder="输入当前账号密码"
+                autoFocus
+              />
+            </label>
+            <div className="modal-actions">
+              <button type="button" className="btn ghost" onClick={cancelDelete} disabled={deleteBusy}>
+                取消
+              </button>
+              <button type="button" className="btn danger-solid" onClick={confirmDelete} disabled={deleteBusy}>
+                {deleteBusy ? '删除中…' : '确认删除'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

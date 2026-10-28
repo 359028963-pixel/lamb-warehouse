@@ -120,6 +120,14 @@ app.post('/api/movements', requireAuth, (req, res) => {
 
 app.delete('/api/movements/:id', requireAuth, (req, res) => {
   try {
+    const password = req.body?.password;
+    if (!password) {
+      return res.status(400).json({ error: '请输入登录密码以确认删除' });
+    }
+    const user = getUserByUsername(req.session.username);
+    if (!user || !bcrypt.compareSync(String(password), user.password_hash)) {
+      return res.status(401).json({ error: '密码错误，未删除' });
+    }
     deleteMovement(Number(req.params.id));
     res.json({ ok: true, stock: getStock() });
   } catch (e) {
