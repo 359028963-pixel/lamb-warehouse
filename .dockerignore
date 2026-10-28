@@ -1,0 +1,11 @@
+node_modules
+**/node_modules
+client/dist
+**/.git
+mobile-preview
+*.log
+*.pid
+cf.log
+tunnel.log
+server/data/*.db-shm
+server/data/*.db-wal

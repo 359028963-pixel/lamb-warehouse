@@ -1,0 +1,20 @@
+{
+  "name": "lamb-warehouse",
+  "version": "1.0.0",
+  "private": true,
+  "description": "羊肉仓库进出库与库存管理系统",
+  "scripts": {
+    "install:all": "npm install && npm install --prefix server && npm install --prefix client",
+    "dev": "concurrently -n server,client -c blue,green \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "build": "npm run build --prefix client",
+    "start": "npm run start --prefix server",
+    "postinstall": "npm install --prefix server && npm install --prefix client",
+    "render-build": "npm install --prefix server && npm install --prefix client && npm run build --prefix client"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

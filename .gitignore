@@ -1,0 +1,14 @@
+node_modules/
+client/node_modules/
+server/node_modules/
+client/dist/
+*.log
+*.pid
+.DS_Store
+server/data/
+*.db
+*.sqlite
+*.sqlite3
+.env
+.env.*
+mobile-preview/
