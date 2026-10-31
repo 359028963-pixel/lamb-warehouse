@@ -147,9 +147,6 @@ export default function TodayPanel({ onStockChange }: Props) {
             onChange={(e) => setDate(e.target.value)}
           />
         </label>
-        <button type="button" className="btn ghost" onClick={() => setDate(todayLocal())}>
-          回到今天
-        </button>
       </div>
 
       {msg && <div className={`alert ${msg.type === 'ok' ? 'ok' : 'error'}`}>{msg.text}</div>}
