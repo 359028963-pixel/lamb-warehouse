@@ -76,6 +76,16 @@ a { color: inherit; }
   border-radius: 10px;
   padding: 10px 12px;
 }
+.login-footer {
+  margin: 18px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  text-align: center;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  opacity: 0.85;
+}
 
 .login-form, .form-card { display: grid; gap: 12px; }
 .remember-row {

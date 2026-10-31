@@ -107,6 +107,10 @@ export default function LoginPage({ onSuccess }: Props) {
         <p className="hint">
           首次使用默认账号：<strong>admin</strong> / <strong>admin123</strong>
         </p>
+
+        <p className="login-footer">
+          made by AYIN.AI&nbsp;&nbsp;v1.0.1
+        </p>
       </div>
     </div>
   )
